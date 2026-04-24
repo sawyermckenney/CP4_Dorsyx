@@ -60,33 +60,43 @@ K = K.flatten()
 
 def CLpen(t,state):
     F = float(-K @ state)
-
     return nonlinearpen(state, F, M, m, L, b, g)
 
-initang = np.random.uniform(0,10)
-print(initang)
-init = [0.0, 0.0, np.radians(initang), 0.0]
+#initang = np.random.uniform(0,10)
+#print(initang)
+#init = [0.0, 0.0, np.radians(initang), 0.0]
+initial_angles = [2, 5, 10]
+results = []
+for angle in initial_angles:
+    init = [0.0, 0.0, np.radians(angle), 0.0]
 
-t = (0,5)
-
-sol = solve_ivp(CLpen,t,init, max_step=0.005, rtol=1e-8)
-
-t     = sol.t
-x     = sol.y[0] # cart position
-xdot  = sol.y[1] # cart velocity
-theta = sol.y[2] # pend angle
-thetadot = sol.y[3] # pend velocity
+    t = (0,10)
+    sol = solve_ivp(CLpen,t,init, max_step=0.005, rtol=1e-8)
+    results.append(sol)
 
 fig, axes = plt.subplots(2,1, figsize=(10,8), sharex=True)
 
-axes[0].plot(t,x, label='X Cart Pos')
-axes[0].plot(t,xdot, label='xdot cart velocity', linestyle='--')
+for i, sol in enumerate(results):
+
+    t = sol.t
+    x = sol.y[0] # cart position
+    xdot = sol.y[1] # cart velocity
+    theta = sol.y[2] # pend angle
+    #thetadot = sol.y[3] # pend velocity
+    axes[0].plot(t,x, label=f'{initial_angles[i]} deg')
+    axes[1].plot(t,np.degrees(theta), label=f'{initial_angles[i]} deg')
+    max_angle = np.max(np.abs(np.degrees(theta)))
+
+axes[1].axhline(20, linestyle='--', color='red')
+axes[1].axhline(-20, linestyle='--', color='red') # plot the 20 degree threshold
+#axes[0].plot(t,x, label='X Cart Pos')
+#axes[0].plot(t,xdot, label='xdot cart velocity', linestyle='--')
 axes[0].set_ylabel('Cart')
 axes[0].legend()
 axes[0].grid(True, alpha = 0.3)
 
-axes[1].plot(t,np.degrees(theta), label='Pendulum Angle')
-axes[1].plot(t,np.degrees(thetadot), label='Pendulum angular velocity', linestyle='--')
+#axes[1].plot(t,np.degrees(theta), label='Pendulum Angle')
+#axes[1].plot(t,np.degrees(thetadot), label='Pendulum angular velocity', linestyle='--')
 axes[1].set_ylabel('Pendulum')
 axes[1].set_xlabel('Time (s)')
 axes[1].legend()
@@ -94,6 +104,12 @@ axes[1].grid(True, alpha = 0.3)
 
 # plt.suptitle('LQR controller for inverted pendulum')
 # plt.show()
+
+sol = results[-1]   # pick the 10° case (hardest one)
+
+t = sol.t
+x = sol.y[0]
+theta = sol.y[2]
 
 framesPerSec = 60
 frame_time = np.arange(0, t[-1], 1/framesPerSec)
