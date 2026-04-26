@@ -50,7 +50,7 @@ B = np.array([
     [-m*L/detL]
 ])
 
-Q = np.diag([20,1,100,1]) # upped the weight for cart position to keep cart within 2 m from origin
+Q = np.diag([40,1,100,1]) # upped the weight for cart position to keep cart within 2 m from origin
 R = np.array([[1]])
 
 K, S, E = control.lqr(A, B, Q, R)
