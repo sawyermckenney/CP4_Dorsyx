@@ -97,7 +97,7 @@ axes[1].grid(True, alpha = 0.3)
 
 framesPerSec = 60
 frame_time = np.arange(0, t[-1], 1/framesPerSec)
-x_frames = np.interp(frame_time, t, x)
+x_frames = np.interp(frame_time, t, x) #https://numpy.org/devdocs/reference/generated/numpy.interp.html
 theta_frames = np.interp(frame_time, t, theta)
 
 fig2, ax = plt.subplots(figsize=(8,6))
@@ -113,11 +113,11 @@ def update(frame):
     xc = x_frames[frame]
     thetac = theta_frames[frame]
     cart.set_xy((xc - cw/2, -ch))
-    bx = xc+ L * np.sin(thetac)
+    bx = xc+ L * np.sin(thetac) # Forward kinematics to get bob position
     by = L * np.cos(thetac)
-    rod.set_data([xc, bx], [0, by])
+    rod.set_data([xc, bx], [0, by]) # updating position of rod
     bob.set_data([bx], [by])
     return cart, rod, bob
-
+# Reference https://matplotlib.org/stable/api/_as_gen/matplotlib.animation.FuncAnimation.html
 anim = FuncAnimation(fig2, update, frames=len(frame_time), blit=True, interval=1000/framesPerSec)
 plt.show()
